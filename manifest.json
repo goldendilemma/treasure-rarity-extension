@@ -11,7 +11,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://trove.treasure.lol/collection/*"],
+      "matches": ["*://trove.treasure.lol/*"],
       "js": ["src/extension/injectTrove.cs.js"]
     }
   ]

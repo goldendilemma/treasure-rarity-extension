@@ -1,23 +1,30 @@
-# Treasure rarity checker
+# Treasure Rarity Checker
 
-## How to use the script
+![](images/icon128.png)
 
-### Trove
+## Requirements
+- Google Chrome or Brave Browser
+
+## Install
+1. [Download Extension](https://github.com/goldendilemma/treasure-rarity-extension/archive/refs/heads/main.zip)
+2. Unzip files
+3. Launch web browser
+4. Visit [chrome://extensions](chrome://extensions)
+5. Enable developer mode in the top right corner ([screenshot](docs/images/enable-developer-mode.png))
+6. Press `Load unpacked`
+7. Navigate to the unzipped folder (see step 2) and press `Ok`
+
+🎉 It's done. Check if it works by visiting a [supported Trove collection](https://trove.treasure.lol/collection/smol-brains). 
+
+## Alternatives
+
+### Run script manually
 
 1. Copy content of script in `src/trove.js`
 2. Open up desired collection on [Trove](https://trove.treasure.lol/)
 3. Open Developer Console
 4. Paste script into `console`
 5. Press enter, badabingbadabong.
-
-### Treasure Marketplace (legacy)
-
-1. Copy content of script in `src/treasure-marketplace.js`
-2. Open up desired collection on [Treasure Marketplace](https://marketplace.treasure.lol/)
-3. Follow steps 3-5 in the section above 👆
-
-## Roadmap
-None atm, might package into a chrome extension at a later stage but for now its just a proof of concept. ARRIVIDERCIIIII 💅
 
 ## Acknowledgements
 - Thanks to [Treasure Tools](https://treasure.tools/) for supplying API with rarity data.

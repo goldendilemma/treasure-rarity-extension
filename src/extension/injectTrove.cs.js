@@ -40,7 +40,28 @@ function setPopulated($node) {
   $node.setAttribute('data-rarity-check', 'true')
 }
 
-function populate (tokenName) {
+function setUnavailable($node) {
+  $node.setAttribute('data-unavailable', 'true')
+}
+
+function removeUnavailable($node) {
+  $node.removeAttribute('data-unavailable')
+  $node.querySelectorAll('.rc-unavailable').forEach($node => $node.remove())
+}
+
+function isUnavailable($node) {
+  return $node.getAttribute('data-unavailable') != null
+}
+
+function populate (tokenName, shouldRender = true) {
+  if (tokenName.trim() === '') {
+    console.log('not rendering, empy name')
+    return
+  }
+  if (!shouldRender) {
+    populateWithMessage('Rarity not available', tokenName)
+    return
+  }
   const $nodes = getTokenNodes()
   if (!$nodes) {
     console.warn('No nodes', tokenName)
@@ -48,6 +69,9 @@ function populate (tokenName) {
   }
   for (let $node of $nodes) {
     if (isPopulated($node)) continue;
+
+    removeUnavailable($node)
+
     const infoWrapper = $node?.children?.[1]
     const bottomWrapper = infoWrapper?.children?.[1]
     const titleWrapper = bottomWrapper?.children?.[0]
@@ -87,19 +111,21 @@ function populate (tokenName) {
   }
 }
 
-function populateWithMessage (message) {
+function populateWithMessage (message, tokenName) {
   const $nodes = getTokenNodes()
   if (!$nodes) {
     console.warn('No nodes', tokenName)
     return
   }
   for (let $node of $nodes) {
-    if (isPopulated($node)) continue;
+    if (isUnavailable($node)) continue;
     const title = $node.children[1].children[1].children[0]
     const $p = document.createElement('p')
     $p.setAttribute('class', 'mt-8 text-sm md:text-base lg:text-xl text-gray-500 text-center max-w-lg lg:max-w-4xl')
+    $p.classList.add('rc-unavailable')
     $p.textContent = message
     title.append($p)
+    setUnavailable($node)
   }
 }
 
@@ -131,7 +157,7 @@ async function loop (cb, opts = {}) {
 /**
  * @credits Leonardo Ciaccio https://stackoverflow.com/questions/3522090/event-when-window-location-href-changes
  */
-function setupObserver (cb) {
+function onPathChange (cb) {
   var oldPath = document.location.pathname;
   var bodyList = document.querySelector("body")
   var observer = new MutationObserver(function(mutations) {
@@ -151,15 +177,20 @@ function setupObserver (cb) {
   observer.observe(bodyList, config);
 }
 
+const validTokenName = (tokenName) => tokenName.trim() !== ''
+
 async function setup () {
   let tokenName = getCurrentTokenName(document.location.pathname)
-  const shouldLoop = await hasRarity(tokenName)
-  setupObserver((path) => tokenName = getCurrentTokenName(path))
-  if (shouldLoop) {
-    loop(() => populate(tokenName))
-  } else {
-    populateWithMessage('Rarity not available')
-  }
+  let shouldRender = validTokenName(tokenName)
+    ? await hasRarity(tokenName)
+    : false
+  onPathChange(async (path) => {
+    tokenName = getCurrentTokenName(path)
+    shouldRender = validTokenName(tokenName)  
+      ? await hasRarity(tokenName)
+      : false
+  })
+  loop(() => populate(tokenName, shouldRender), { waitFor: 1250 })
 }
 
 setup()
