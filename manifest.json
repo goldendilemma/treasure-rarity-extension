@@ -1,6 +1,6 @@
 {
   "name": "Trove Rarity",
-  "description": "Check rarity score from treasure.tools directly on Trove Marketplace",
+  "description": "Check rarity score from treasure.tools directly from Trove Marketplace",
   "version": "0.1",
   "manifest_version": 3,
   "icons": {
@@ -12,7 +12,7 @@
   "content_scripts": [
     {
       "matches": ["*://trove.treasure.lol/*"],
-      "js": ["src/extension/injectTrove.cs.js"]
+      "js": ["src/injectTrove.cs.js"]
     }
   ]
 }
