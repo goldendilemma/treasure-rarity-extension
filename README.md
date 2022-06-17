@@ -1,6 +1,12 @@
+![Wannabee logo. Red shield with creme colored diamond on top.](images/icon128.png)
+
 # Treasure Rarity Checker
 
-![Wannabee logo. Red shield with creme colored diamond on top.](images/icon128.png)
+Check rarity rating on supported collections from [treasure.tools](https://treasure.tools) while scrolling Trove. 
+
+Easy peasy 🍋 squeezy.
+
+![Preview of the extension in action](docs/preview.png)
 
 ## Requirements
 - Google Chrome or Brave Browser
@@ -20,11 +26,11 @@
 
 ### Run script manually
 
-1. Copy content of script in `src/extension/injectTrove.cs.js`
+1. Copy content of script in `src/injectTrove.cs.js`
 2. Open up desired collection on [Trove](https://trove.treasure.lol/)
 3. Open Developer Console
 4. Paste script into `console`
 5. Press enter, badabingbadabong.
 
 ## Acknowledgements
-- Thanks to [Treasure Tools](https://treasure.tools/) for supplying API with rarity data.
+- Thanks to [Treasure Tools](https://treasure.tools/) for supplying API with rarity data. 🫂
