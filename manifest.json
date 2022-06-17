@@ -9,15 +9,10 @@
     "48": "/images/icon48.png",
     "128": "/images/icon128.png"
   },
-  "background": {
-    "service_worker": "src/extension/background.js"
-  },
-  "permissions": [
-    "action",
-    "scripting",
-    "activeTab"
-  ],
-  "action": {
-    "default_title": "Up up and away web!"
-  }
+  "content_scripts": [
+    {
+      "matches": ["*://trove.treasure.lol/collection/*"],
+      "js": ["src/extension/injectTrove.cs.js"]
+    }
+  ]
 }

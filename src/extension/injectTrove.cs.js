@@ -1,4 +1,15 @@
-// rarity check
+/**
+          ████
+        ██░░░░██
+      ██░░░░░░░░██
+      ██░░░░░░░░██
+    ██░░░  ░░  ░░░██
+    ██░░░█ ░░█ ░░░██
+    ██░░░░░░░░░░░░██
+      ██░░░  ░░░██
+        ████████
+ */
+
 async function hasRarity (tokenName) {
   const res = await fetch(`https://treasure.tools/api/collections/${tokenName}/tokens-721?page=1&search=&filter=`)
   return res.status === 200
@@ -16,8 +27,7 @@ function createButton (textContent) {
   return $button
 }
 
-function getCurrentTokenName () {
-  const path = document.location.pathname
+function getCurrentTokenName (path) {
   const parts = path.split('/')
   return parts[parts.length - 1]
 }
@@ -32,11 +42,17 @@ function setPopulated($node) {
 
 function populate (tokenName) {
   const $nodes = getTokenNodes()
+  if (!$nodes) {
+    console.warn('No nodes', tokenName)
+    return
+  }
   for (let $node of $nodes) {
     if (isPopulated($node)) continue;
-    const infoWrapper = $node.children[1]
-    const bottomWrapper = infoWrapper.children[1]
-    const titleWrapper = bottomWrapper.children[0]
+    const infoWrapper = $node?.children?.[1]
+    const bottomWrapper = infoWrapper?.children?.[1]
+    const titleWrapper = bottomWrapper?.children?.[0]
+    
+    if (!titleWrapper) continue;
 
     const parts = titleWrapper.textContent.split('#')
     const tokenId = Number(parts[parts.length - 1])
@@ -73,6 +89,10 @@ function populate (tokenName) {
 
 function populateWithMessage (message) {
   const $nodes = getTokenNodes()
+  if (!$nodes) {
+    console.warn('No nodes', tokenName)
+    return
+  }
   for (let $node of $nodes) {
     if (isPopulated($node)) continue;
     const title = $node.children[1].children[1].children[0]
@@ -100,14 +120,46 @@ async function wait (ms) {
   })
 }
 
-async function init () {
-  // setup script
-  const tokenName = getCurrentTokenName()
-  if (await hasRarity(tokenName)) {
-    populate(tokenName)
+async function loop (cb, opts = {}) {
+  const { waitFor = 1000 } = opts
+  while (true) {
+    await wait(waitFor)
+    await cb()
+  }
+}
+
+/**
+ * @credits Leonardo Ciaccio https://stackoverflow.com/questions/3522090/event-when-window-location-href-changes
+ */
+function setupObserver (cb) {
+  var oldPath = document.location.pathname;
+  var bodyList = document.querySelector("body")
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (oldPath != document.location.pathname) {
+        oldPath = document.location.pathname;
+        cb(oldPath)
+      }
+    });
+  });
+  
+  var config = {
+      childList: true,
+      subtree: true
+  };
+  
+  observer.observe(bodyList, config);
+}
+
+async function setup () {
+  let tokenName = getCurrentTokenName(document.location.pathname)
+  const shouldLoop = await hasRarity(tokenName)
+  setupObserver((path) => tokenName = getCurrentTokenName(path))
+  if (shouldLoop) {
+    loop(() => populate(tokenName))
   } else {
     populateWithMessage('Rarity not available')
   }
 }
 
-init()
+setup()
