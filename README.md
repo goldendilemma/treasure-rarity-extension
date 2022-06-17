@@ -1,6 +1,6 @@
 # Treasure Rarity Checker
 
-![](images/icon128.png)
+![Wannabee logo. Red shield with creme colored diamond on top.](images/icon128.png)
 
 ## Requirements
 - Google Chrome or Brave Browser
@@ -11,8 +11,8 @@
 3. Launch web browser
 4. Navigate to `chrome://extensions` by copy & pasting link into your url bar
 5. Enable developer mode in the top right corner ([screenshot](docs/images/enable-developer-mode.png))
-6. Press `Load unpacked`
-7. Navigate to the unzipped folder (see step 2) and press `Ok`
+6. Press `Load unpacked` to the top left ([screenshot](docs/images/load-unpacked.png))
+7. Navigate to the unzipped folder from `2.` and press `Ok` ([screenshot](docs/images/select-folder.png))
 
 🎉 It's done. Check if it works by visiting a [supported Trove collection](https://trove.treasure.lol/collection/smol-brains). 
 
