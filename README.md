@@ -26,6 +26,8 @@ Easy peasy 🍋 squeezy.
 
 ### Run script manually
 
+*Not recommended*
+
 1. Copy content of script in `src/injectTrove.cs.js`
 2. Open up desired collection on [Trove](https://trove.treasure.lol/)
 3. Open Developer Console
