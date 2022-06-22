@@ -280,4 +280,6 @@ async function setup () {
     if (matchAll(href, '/user/') && document.location.search === '' || matchAll(href, '/user/', '?tab=vault')) populateWallet()
   }, { waitFor: 1250 })
 
+}
+
 setup()
