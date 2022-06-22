@@ -130,7 +130,7 @@ function populateWithMessage (message, tokenName) {
 }
 
 function getTokenNodes () {
-  const container = document.getElementsByClassName('sm:grid-cols-collection-grid-lg snap-y snap-proximity grid grid-cols-2  grid-flow-row gap-2 sm:gap-5')?.[0]
+  const container = document.querySelector('.w-full div > .grid-cols-1.snap-y.snap-proximity.grid.grid-flow-row')
   return container != null
     ? [...container.children]
     : null
