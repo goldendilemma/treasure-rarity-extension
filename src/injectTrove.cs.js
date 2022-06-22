@@ -28,7 +28,9 @@ function createButton (textContent) {
 }
 
 function getCurrentTokenName (path) {
-  const parts = path.split('/')
+  const parts = path
+    .split('?')[0]
+    .split('/')
   return parts[parts.length - 1]
 }
 
@@ -53,7 +55,57 @@ function isUnavailable($node) {
   return $node.getAttribute('data-unavailable') != null
 }
 
+function populateNode ($node, tokenInfo = {}) {
+
+  if (isPopulated($node)) return;
+
+  const infoWrapper = $node?.children?.[1]
+  const bottomWrapper = infoWrapper?.children?.[1]
+
+  const $wrapper = document.createElement('div')
+  $wrapper.setAttribute('class', 'flex justify-center items-center pt-2')
+
+  const { collectionId, tokenId } = tokenInfo
+
+  const $button = createButton('Check Rarity')
+  $button.addEventListener('click', () => {
+    $button.textContent = 'Loading..'
+      getRarity(collectionId, tokenId)
+      .then((response) => {
+        $button.setAttribute('disabled', 'disabled')
+        $button.classList.remove('hover:bg-accent-light')
+        $button.classList.add('bg-default', 'text-page') 
+        if (response.count !== 0) {
+          const token = response.list[0]
+          $button.textContent = 'Rarity #' + token.nft_rank
+          $button.setAttribute('title', `Rarity score ${token.rarity_score}\nTrait count: ${token.trait_count}\n1/1: ${token.is_one_of_one ? 'Yes' : 'No'}`)
+        } else {
+          $button.textContent = 'Not found!'
+        }
+      })
+      .catch(err => {
+        $button.textContent = 'Error'
+        $button.setAttribute('title', 'Error: ' + err.message)
+      })
+  })
+  $wrapper.appendChild($button)
+  bottomWrapper.append($wrapper)
+  setPopulated($node)
+}
+
+function populateWallet () {
+  console.log('populating wallet')
+  const $nodes = getWalletNodes()
+  if ($nodes) {
+    const parsed = $nodes.map(parseWalletItem)
+    for (let { node, ...tokenInfo } of parsed) {
+      populateNode(node, tokenInfo)
+    }
+  }
+}
+
 function populate (tokenName, shouldRender = true) {
+  console.log('populating collection')
   if (tokenName.trim() === '') {
     console.log('not rendering, empy name')
     return
@@ -136,6 +188,33 @@ function getTokenNodes () {
     : null
 }
 
+function parseWalletItem ($node) {
+  const infoWrapper = $node?.children?.[1]
+  const bottomWrapper = infoWrapper?.children?.[1]
+  const titleWrapper = bottomWrapper?.children?.[1]
+  const collectionWrapper = bottomWrapper?.children?.[0]
+
+  if (!titleWrapper) return null
+
+  const parts = titleWrapper?.textContent?.split('#')
+  const tokenId = parts?.[parts?.length - 1]
+
+  const collectionUrl = collectionWrapper.getAttribute('href')
+  const colName = getCurrentTokenName(collectionUrl)
+  return {
+    tokenId,
+    collectionId: colName,
+    node: $node
+  }
+}
+
+function getWalletNodes () {
+  const container = document.querySelector('.w-full div > .grid.grid-cols-2.grid-flow-row.gap-2')
+  return container != null
+    ? [...container.children]
+    : null
+}
+
 async function wait (ms) {
   return new Promise((resolve, reject) => {
     try {
@@ -158,13 +237,13 @@ async function loop (cb, opts = {}) {
  * @credits Leonardo Ciaccio https://stackoverflow.com/questions/3522090/event-when-window-location-href-changes
  */
 function onPathChange (cb) {
-  var oldPath = document.location.pathname;
+  var oldPath = document.location.href;
   var bodyList = document.querySelector("body")
   var observer = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
-      if (oldPath != document.location.pathname) {
-        oldPath = document.location.pathname;
-        cb(oldPath)
+      if (oldPath != document.location.href) {
+        oldPath = document.location.href;
+        cb(document.location.pathname, document.location.href)
       }
     });
   });
@@ -179,6 +258,11 @@ function onPathChange (cb) {
 
 const validTokenName = (tokenName) => tokenName.trim() !== ''
 
+function matchAll (haystack, ...needles) {
+  const matched = needles.filter(needle => haystack.indexOf(needle) > -1).length
+  return matched === needles.length
+}
+
 async function setup () {
   let tokenName = getCurrentTokenName(document.location.pathname)
   let shouldRender = validTokenName(tokenName)
@@ -190,7 +274,10 @@ async function setup () {
       ? await hasRarity(tokenName)
       : false
   })
-  loop(() => populate(tokenName, shouldRender), { waitFor: 1250 })
-}
+  loop(() => {
+    const href = document.location.href
+    if (matchAll(href, '/collection/')) populate(tokenName, shouldRender)
+    if (matchAll(href, '/user/') && document.location.search === '' || matchAll(href, '/user/', '?tab=vault')) populateWallet()
+  }, { waitFor: 1250 })
 
 setup()
